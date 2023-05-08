@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
 
-pub const SWH_HTTP_API_URL: &str = "http://localhost:50761";
+pub const SWH_HTTP_API_PORT: u16 = 50761;
 
 #[derive(Debug, Deserialize, Serialize)]
 pub struct SwhResponse {

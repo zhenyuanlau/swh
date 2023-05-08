@@ -1,39 +1,42 @@
-use clap::{Parser, Subcommand};
+use clap::Parser;
+use log::error;
 
-use anyhow::Result;
-use swh::cmd::list::{List, ListCommand};
-use swh::cmd::toggle::{Toggle, ToggleCommand};
-use swh::cmd::Command;
-
-#[derive(Debug, Parser)]
-#[command(author, version, about, long_about = None)]
-pub struct Cli {
-    #[clap(flatten)]
-    verbose: clap_verbosity_flag::Verbosity,
-    #[command(subcommand)]
-    pub command: Commands,
-}
-
-#[derive(Debug, Subcommand)]
-pub enum Commands {
-    List(List),
-    Toggle(Toggle),
-}
+use miette::Result;
+use swh::cli::list::ListCommand;
+use swh::cli::open::OpenCommand;
+use swh::cli::serve::ServeCommand;
+use swh::cli::show::ShowCommand;
+use swh::cli::toggle::ToggleCommand;
+use swh::cli::{Cli, CommandHandler, Commands};
+use swh::core::config_file::ConfigFile;
+use swh::core::host_file::HostFile;
+use swh::util;
 
 #[tokio::main]
 async fn main() -> Result<()> {
     env_logger::init();
 
+    util::escalate()?;
+
+    ConfigFile::create_if_not_exists()?;
+    let config = ConfigFile::load()?;
+    let mut hf = HostFile::load()?;
+    hf.sync(config)?;
+
     let cli = Cli::parse();
 
     let future_result = match cli.command {
-        Commands::List(ref args) => ListCommand.execute(args),
-        Commands::Toggle(ref args) => ToggleCommand.execute(args),
+        Commands::List(ref args) => ListCommand.process(args),
+        Commands::Toggle(ref args) => ToggleCommand.process(args),
+        Commands::Show(ref args) => ShowCommand.process(args),
+        Commands::Open(ref args) => OpenCommand.process(args),
+        Commands::Serve(ref args) => ServeCommand.process(args),
     };
+
     match future_result.await {
         Ok(()) => {}
         Err(err) => {
-            eprintln!("{}", err);
+            error!("{}", err);
             std::process::exit(1)
         }
     }

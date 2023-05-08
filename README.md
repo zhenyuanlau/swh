@@ -2,42 +2,71 @@
 
 A CLI for Switch Hosts.
 
-## SwitchHosts
+## Usage
 
-Need to install [SwitchHosts](https://github.com/oldj/SwitchHosts), and turn on HTTP API by checking `Preferences -> General -> HTTP API on`.
+### Config hosts in single file
 
-## Examples
-
-### Get Hosts List
-
-```bash
-$ swh list
-╭────┬──────────────┬──────────────────────────────────────┬───────╮
-│ #  │ title        │ id                                   │ on    │
-╞════╪══════════════╪══════════════════════════════════════╪═══════╡
-│ 0  │ development  │ 1ba37287-b3af-4359-b44d-bbf0f2953ee8 │ true  │
-├────┼──────────────┼──────────────────────────────────────┼───────┤
-│ 1  │ staging      │ 2675f67d-97d7-4689-a59a-4ea666eb97d1 │ false │
-├────┼──────────────┼──────────────────────────────────────┼───────┤
-│ 13 │ production   │ 48d52d0e-9f26-487c-a981-b45f46cdf9c5 │ false │
-╰────┴──────────────┴──────────────────────────────────────┴───────╯
+```shell
+$ swh open # default: ~/.config/swh/config.kdl
 ```
 
-### Toggle Hosts
+Config file example, syntax in [KDL](https://kdl.dev/):
+
+```kdl
+
+// ~/.config/swh/config.kdl
+
+version "1.0"
+
+env "local" enabled=true {
+
+  host "127.0.0.1" name="localhost" {
+    alias "localhost.domain"
+  }
+
+  host "255.255.255.255" name="broadcast.host"
+
+}
+
+include "dev" // support in the future
+
+```
+
+### SWH CLI
 
 ```bash
-$ swh toggle 1ba37287-b3af-4359-b44d-bbf0f2953ee8
 
-ok
+$ swh list
+
+╭────┬──────────────┬──────────╮
+│ #  │ env          │ enabled  │
+╞════╪══════════════╪══════════╡
+│ 0  │ development  │ true     │
+├────┼──────────────┼──────────┤
+│ 1  │ staging      │ false    │
+├────┼──────────────┼──────────┤
+│ 2  │ production   │ false    │
+╰────┴──────────────┴──────────╯
+```
+
+```bash
+$ swh toggle production
+```
+
+```bash
+$ swh show production
 ```
 
 ## Roadmap
 
 Using `swh` instead of SwitchHosts.
 
-- [x] High-frequency operations
-- [ ] Hosts CRUD
-- [ ] Enhancements
+- [x] SWH CLI
+- [x] Host config in single file
+- [ ] Host config in multiple files
+- [ ] Host CRUD in CLI
+- [ ] More features
+- [ ] SWH HTTP API
 
 ## License
 

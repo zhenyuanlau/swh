@@ -1,0 +1,13 @@
+version "1.0"
+
+env "local" enabled=true {
+
+  host "127.0.0.1" name="localhost" {
+    alias "localhost.domain"
+  }
+
+  host "255.255.255.255" name="broadcast.host"
+
+}
+
+include "dev"
