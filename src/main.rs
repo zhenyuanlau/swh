@@ -9,19 +9,12 @@ use swh::cli::show::ShowCommand;
 use swh::cli::toggle::ToggleCommand;
 use swh::cli::{Cli, CommandHandler, Commands};
 use swh::core::config_file::ConfigFile;
-use swh::core::host_file::HostFile;
-use swh::util;
 
 #[tokio::main]
 async fn main() -> Result<()> {
     env_logger::init();
 
-    util::escalate()?;
-
     ConfigFile::create_if_not_exists()?;
-    let config = ConfigFile::load()?;
-    let mut hf = HostFile::load()?;
-    hf.sync(config)?;
 
     let cli = Cli::parse();
 
